@@ -43,6 +43,7 @@ endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
     did = json['did'].empty? ? "" : json['did']
   rescue => e
     client_name = SecureRandom.uuid
+    did = ""
   end
 
   # generate a new password for the keystore
