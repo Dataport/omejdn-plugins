@@ -77,3 +77,18 @@ endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
     "scope": "idsc:IDS_CONNECTOR_ATTRIBUTES_ALL"
   })
 end
+
+endpoint '/api/v1/connectors/remove', ['DELETE'], public_endpoint: true do
+  begin
+    json = JSON.parse request.body.read
+    client_name = json['client_name']
+  rescue => e
+    halt 400
+  end
+
+  # delete client from keystore
+  delete_cmd = "./scripts/delete_connector.sh #{client_name}"
+  `#{delete_cmd}`
+
+  halt 200
+end
