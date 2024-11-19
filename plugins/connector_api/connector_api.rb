@@ -77,3 +77,49 @@ endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
     "scope": "idsc:IDS_CONNECTOR_ATTRIBUTES_ALL"
   })
 end
+
+
+endpoint '/api/v1/connectors/details', ['POST'], public_endpoint: true do
+  begin
+    json = JSON.parse request.body.read
+    client_name = json['client_name']
+    client_id = json['client_id']
+  rescue => e
+    halt 400
+  end
+  id_type = (client_id.nil? || client_id.empty?) ? "name" : "id"
+  used_id = (id_type == "name") ? client_name : client_id
+
+  connector_details = {}
+  if used_id.class == Array
+    used_id.each do |uid|
+      details = load_connector_details(uid, id_type)
+      if !details.nil?
+        connector_details[uid] = details
+      end
+    end
+  else
+    connector_details = load_connector_details(used_id, id_type)
+    if connector_details.nil?
+      halt 404
+    end
+  end
+
+  halt 200, JSON.generate(connector_details)
+end
+
+def load_connector_details(used_id, id_type)
+  # load info from clients
+  details_cmd = "./scripts/read_connector_details.sh #{id_type} #{used_id}"
+  details_cmd_value = `#{details_cmd}`
+  if $?.exitstatus != 0
+    return nil
+  end
+  p details_cmd_value
+  details_json = JSON.parse(details_cmd_value)
+  if details_json.class == Array
+    details_json = details_json[0]
+  end
+
+  return details_json
+end
