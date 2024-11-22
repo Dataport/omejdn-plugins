@@ -134,5 +134,11 @@ def load_connector_details(used_id, id_type)
     details_json = details_json[0]
   end
 
-  return details_json
+  cleaned_details = {
+    "client_name": details_json['client_name'],
+    "client_id": details_json['client_id'],
+    "attributes": details_json['attributes'],
+  }
+
+  return cleaned_details
 end
