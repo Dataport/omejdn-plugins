@@ -78,6 +78,20 @@ endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
   })
 end
 
+endpoint '/api/v1/connectors/details/:client_id', ['GET'], public_endpoint: true do
+  begin
+    client_id = params['client_id']
+  rescue => e
+    halt 400
+  end
+
+  connector_details = load_connector_details(client_id, "id")
+  if connector_details.nil?
+    halt 404
+  end
+
+  halt 200, JSON.generate(connector_details)
+end
 
 endpoint '/api/v1/connectors/details', ['POST'], public_endpoint: true do
   begin
@@ -112,10 +126,9 @@ def load_connector_details(used_id, id_type)
   # load info from clients
   details_cmd = "./scripts/read_connector_details.sh #{id_type} #{used_id}"
   details_cmd_value = `#{details_cmd}`
-  if $?.exitstatus != 0
+  if $?.exitstatus != 0 || details_cmd_value.empty?
     return nil
   end
-  p details_cmd_value
   details_json = JSON.parse(details_cmd_value)
   if details_json.class == Array
     details_json = details_json[0]
