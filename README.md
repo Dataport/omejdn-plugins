@@ -6,5 +6,17 @@ This repository contains plugins that are used within the MERLOT project to achi
 ## Structure
 
     ├── plugins
-    │   ├── connector_api    # basic API plugin that adds (unauthorized!) endpoints for easy creation of a new DAPS certificate
+    │   ├── connector_api    # basic API plugin that adds (unauthorized!) endpoints for easy creation/deletion/retrieval of a new DAPS certificate
     ├── scripts              # scripts internally used by the plugins
+
+## Endpoints
+
+The following endpoints are made available by the connector API plugin:
+
+
+| Endpoint         | Description                                                                                                              |
+|------------------|--------------------------------------------------------------------------------------------------------------------------|
+| POST /api/v1/connectors/add       | Given a payload containing a client_name and did, generate a new certificate and onboard it to the DAPS service. Returns the certificate details.  |
+| GET /api/v1/connectors/details/:client_id | Returns the stored attributes corresponding to that client_id                                                     |
+| POST /api/v1/connectors/details | Given a single client_id or client_name or a list of one of them, return the corresponding stored attributes. The client_id takes prevalence over client_name in the request if both are specified.  |
+
