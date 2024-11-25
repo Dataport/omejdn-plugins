@@ -122,6 +122,21 @@ endpoint '/api/v1/connectors/details', ['POST'], public_endpoint: true do
   halt 200, JSON.generate(connector_details)
 end
 
+endpoint '/api/v1/connectors/remove', ['DELETE'], public_endpoint: true do
+  begin
+    json = JSON.parse request.body.read
+    client_name = json['client_name']
+  rescue => e
+    halt 400
+  end
+
+  # delete client from keystore
+  delete_cmd = "./scripts/delete_connector.sh #{client_name}"
+  `#{delete_cmd}`
+
+  halt 200
+end
+
 def load_connector_details(used_id, id_type)
   # load info from clients
   details_cmd = "./scripts/read_connector_details.sh #{id_type} #{used_id}"
@@ -141,4 +156,3 @@ def load_connector_details(used_id, id_type)
   }
 
   return cleaned_details
-end
