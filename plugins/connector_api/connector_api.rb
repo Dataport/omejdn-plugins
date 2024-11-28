@@ -149,10 +149,16 @@ def load_connector_details(used_id, id_type)
     details_json = details_json[0]
   end
 
+  attributes = {}
+  details_json['attributes'].each do |attr|
+    attributes[attr['key']] = attr['value']
+  end
+
   cleaned_details = {
     "client_name": details_json['client_name'],
     "client_id": details_json['client_id'],
-    "attributes": details_json['attributes'],
+    "attributes": attributes,
   }
 
   return cleaned_details
+end
