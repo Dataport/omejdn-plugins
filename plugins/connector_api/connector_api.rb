@@ -122,10 +122,9 @@ endpoint '/api/v1/connectors/details', ['POST'], public_endpoint: true do
   halt 200, JSON.generate(connector_details)
 end
 
-endpoint '/api/v1/connectors/remove', ['DELETE'], public_endpoint: true do
+endpoint '/api/v1/connectors/:client_name', ['DELETE'], public_endpoint: true do
   begin
-    json = JSON.parse request.body.read
-    client_name = json['client_name']
+    client_name = params['client_name']
   rescue => e
     halt 400
   end

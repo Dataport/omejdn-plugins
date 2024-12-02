@@ -21,21 +21,21 @@ fi
 
 CLIENT_NAME=$1
 # load certificate file to get client ID from name
-CLIENT_CERT="keys/$CLIENT_NAME.cert"
-if [ ! -f $CLIENT_CERT ]; then
-    echo "Client $CLIENT_NAME does not exist"
+CLIENT_CERT="keys/${CLIENT_NAME}.cert"
+if [ ! -f ${CLIENT_CERT} ]; then
+    echo "Client ${CLIENT_NAME} does not exist"
     exit 1
 fi
-SKI="$(grep -A1 "Subject Key Identifier"  "$CLIENT_CERT" | tail -n 1 | tr -d ' ')"
-AKI="$(grep -A1 "Authority Key Identifier"  "$CLIENT_CERT" | tail -n 1 | tr -d ' ')"
+SKI="$(grep -A1 "Subject Key Identifier"  "${CLIENT_CERT}" | tail -n 1 | tr -d ' ')"
+AKI="$(grep -A1 "Authority Key Identifier"  "${CLIENT_CERT}" | tail -n 1 | tr -d ' ')"
 CLIENT_ID="$SKI:$AKI"
 
-echo "Removing $CLIENT_NAME from clients.yml"
+echo "Removing ${CLIENT_NAME} from clients.yml"
 # remove entry from yaml
-yq -i -y 'del(.[] | select(.client_id == "'"$CLIENT_ID"'"))' config/clients.yml
+yq -i -y 'del(.[] | select(.client_id == "'"${CLIENT_ID}"'"))' config/clients.yml
 # if no entries are left, remove the empty list as well
 sed -i '/^\[\]/d' config/clients.yml
 
 # remove corresponding key and certificate files
-echo "Removing $CLIENT_NAME keys and certificates"
-rm keys/$CLIENT_NAME.key keys/$CLIENT_NAME.cert keys/clients/${CLIENT_ID}.cert
+echo "Removing ${CLIENT_NAME} keys and certificates"
+rm keys/${CLIENT_NAME}.key keys/${CLIENT_NAME}.cert keys/clients/${CLIENT_ID}.cert
