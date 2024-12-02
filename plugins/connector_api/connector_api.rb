@@ -115,6 +115,7 @@ endpoint '/api/v1/connectors', ['GET'], public_endpoint: true do
     end
   end
 
+  content_type :json
   halt 200, JSON.generate(connector_details)
 end
 
