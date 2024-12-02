@@ -34,7 +34,7 @@ rescue StandardError => e
   halt 401
 end
 
-endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
+endpoint '/api/v1/connectors', ['POST'], public_endpoint: true do
 
   begin
     # use client name of body if available
@@ -93,44 +93,40 @@ endpoint '/api/v1/connectors/:client_id', ['GET'], public_endpoint: true do
   halt 200, JSON.generate(connector_details)
 end
 
-endpoint '/api/v1/connectors/details', ['POST'], public_endpoint: true do
+endpoint '/api/v1/connectors', ['GET'], public_endpoint: true do
   begin
-    json = JSON.parse request.body.read
-    client_name = json['client_name']
-    client_id = json['client_id']
+    client_name = params['client_name']
+    client_id = params['client_id']
   rescue => e
     halt 400
   end
   id_type = (client_id.nil? || client_id.empty?) ? "name" : "id"
   used_id = (id_type == "name") ? client_name : client_id
 
+  if used_id.class != Array
+    used_id = [used_id]
+  end
+
   connector_details = {}
-  if used_id.class == Array
-    used_id.each do |uid|
-      details = load_connector_details(uid, id_type)
-      if !details.nil?
-        connector_details[uid] = details
-      end
-    end
-  else
-    connector_details = load_connector_details(used_id, id_type)
-    if connector_details.nil?
-      halt 404
+  used_id.each do |uid|
+    details = load_connector_details(uid, id_type)
+    if !details.nil?
+      connector_details[uid] = details
     end
   end
 
   halt 200, JSON.generate(connector_details)
 end
 
-endpoint '/api/v1/connectors/:client_name', ['DELETE'], public_endpoint: true do
+endpoint '/api/v1/connectors/:client_id', ['DELETE'], public_endpoint: true do
   begin
-    client_name = params['client_name']
+    client_id = params['client_id']
   rescue => e
     halt 400
   end
 
   # delete client from keystore
-  delete_cmd = "./scripts/delete_connector.sh #{client_name}"
+  delete_cmd = "./scripts/delete_connector.sh #{client_id}"
   `#{delete_cmd}`
 
   halt 200
