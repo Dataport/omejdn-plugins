@@ -78,7 +78,7 @@ endpoint '/api/v1/connectors/add', ['POST'], public_endpoint: true do
   })
 end
 
-endpoint '/api/v1/connectors/details/:client_id', ['GET'], public_endpoint: true do
+endpoint '/api/v1/connectors/:client_id', ['GET'], public_endpoint: true do
   begin
     client_id = params['client_id']
   rescue => e
